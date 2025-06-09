@@ -49,7 +49,7 @@
 
     button {
       padding: 10px 20px;
-      margin-left: 10px;
+      margin: 5px;
       font-size: 16px;
       cursor: pointer;
       border: none;
@@ -67,14 +67,27 @@
       top: 20px;
       right: 20px;
     }
+
+    .music-toggle {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
+    /* Ẩn khung nhạc YouTube */
+    #ytplayer {
+      position: fixed;
+      left: -9999px;
+      top: -9999px;
+    }
   </style>
 </head>
 <body>
 
   <button class="theme-toggle" onclick="toggleTheme()">🌗 Chuyển giao diện</button>
+  <button class="music-toggle" onclick="toggleMusic()">🎵 Bật/Tắt Nhạc</button>
 
   <h1>⏳ Đếm Ngược Kỳ Thi THPT Quốc Gia</h1>
-  
   <div class="countdown" id="countdown">Đang tải...</div>
 
   <div class="controls">
@@ -83,9 +96,11 @@
     <button onclick="updateExamDate()">Cập nhật</button>
   </div>
 
-  <script>
-    let examDate = new Date("2025-06-26T00:00:00").getTime(); // Mặc định
+  <!-- Nhúng nhạc từ YouTube (ẩn) -->
+  <div id="ytplayer"></div>
 
+  <script>
+    let examDate = new Date("2025-06-26T00:00:00").getTime();
     const countdown = document.getElementById("countdown");
 
     function updateCountdown() {
@@ -106,11 +121,9 @@
       countdown.innerHTML = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
     }
 
-    // Cập nhật mỗi giây
     const interval = setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    // Cập nhật ngày từ input
     function updateExamDate() {
       const input = document.getElementById("examDate").value;
       if (input) {
@@ -121,10 +134,51 @@
       }
     }
 
-    // Chuyển theme
     function toggleTheme() {
       document.body.classList.toggle("dark-theme");
     }
+
+    // Nhạc YouTube
+    let player;
+    let musicPlaying = false;
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('ytplayer', {
+        height: '0',
+        width: '0',
+        videoId: '6kCtYMct3_0', // 🎵 ID video nhạc YouTube (có thể thay bằng video bạn thích)
+        playerVars: {
+          'autoplay': 0,
+          'controls': 0,
+          'loop': 1,
+          'playlist': 'ZtRTh8BU4sQ', // để lặp lại
+          'mute': 0
+        },
+        events: {
+          'onReady': onPlayerReady
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      // Không phát tự động - chờ user bấm nút bật
+    }
+
+    function toggleMusic() {
+      if (!player) return;
+      if (musicPlaying) {
+        player.pauseVideo();
+      } else {
+        player.playVideo();
+      }
+      musicPlaying = !musicPlaying;
+    }
+
+    // Tải thư viện YouTube API
+    let tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    let firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   </script>
 
 </body>
