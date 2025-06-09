@@ -2,37 +2,58 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Đếm Ngược Kỳ Thi THPT Quốc Gia</title>
+  <title>🎓 Đếm Ngược Kỳ Thi THPT Quốc Gia</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
-      --bg-light: #f5f5f5;
-      --text-light: #2c3e50;
-      --bg-dark: #121212;
-      --text-dark: #f0f0f0;
-      --accent: #e74c3c;
+      --light-bg: url('https://images.unsplash.com/photo-1531219432768-9f540ce91ef1?auto=format&fit=crop&w=1920&q=80');
+      --dark-bg: url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1920&q=80');
+      --glass-light: rgba(255,255,255,0.25);
+      --glass-dark: rgba(0,0,0,0.4);
+      --text-light: #000;
+      --text-dark: #fff;
+      --accent: #ff416c;
     }
 
     body {
-      font-family: 'Arial', sans-serif;
-      text-align: center;
-      padding-top: 50px;
-      background-color: var(--bg-light);
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--light-bg) no-repeat center center fixed;
+      background-size: cover;
       color: var(--text-light);
-      transition: 0.3s;
+      transition: all 0.5s ease;
     }
 
-    .dark-theme {
-      background-color: var(--bg-dark);
+    body.dark {
+      background: var(--dark-bg) no-repeat center center fixed;
       color: var(--text-dark);
     }
 
-    h1 {
-      font-size: 30px;
+    .container {
+      backdrop-filter: blur(20px);
+      background: var(--glass-light);
+      border-radius: 20px;
+      padding: 30px;
+      margin: 80px auto;
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      transition: 0.5s;
     }
 
-    .countdown {
-      font-size: 36px;
-      margin: 20px 0;
+    body.dark .container {
+      background: var(--glass-dark);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .countdown, .current-time {
+      font-size: 24px;
+      margin: 10px 0;
       color: var(--accent);
     }
 
@@ -42,144 +63,176 @@
 
     input[type="date"] {
       padding: 10px;
+      border-radius: 10px;
+      border: none;
       font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      margin: 5px;
     }
 
     button {
-      padding: 10px 20px;
-      margin: 5px;
+      padding: 10px 16px;
       font-size: 16px;
-      cursor: pointer;
       border: none;
-      border-radius: 6px;
-      background-color: #3498db;
+      border-radius: 10px;
+      background: var(--accent);
       color: white;
+      margin: 5px;
+      cursor: pointer;
     }
 
     button:hover {
       opacity: 0.9;
     }
 
-    .theme-toggle {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-    }
-
-    .music-toggle {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-    }
-
-    /* Ẩn khung nhạc YouTube */
-    #ytplayer {
+    .top-buttons {
       position: fixed;
-      left: -9999px;
-      top: -9999px;
+      top: 15px;
+      right: 15px;
+      z-index: 999;
+      display: flex;
+      gap: 10px;
+    }
+
+    .top-buttons button {
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #ytplayer {
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 22px; }
+      .countdown, .current-time { font-size: 18px; }
     }
   </style>
 </head>
 <body>
 
-  <button class="theme-toggle" onclick="toggleTheme()">🌗 Chuyển giao diện</button>
-  <button class="music-toggle" onclick="toggleMusic()">🎵 Bật/Tắt Nhạc</button>
-
-  <h1>⏳ Đếm Ngược Kỳ Thi THPT Quốc Gia</h1>
-  <div class="countdown" id="countdown">Đang tải...</div>
-
-  <div class="controls">
-    <label for="examDate">Chọn ngày thi: </label>
-    <input type="date" id="examDate" />
-    <button onclick="updateExamDate()">Cập nhật</button>
+  <div class="top-buttons">
+    <button onclick="toggleTheme()">🌙/☀️</button>
+    <button onclick="toggleMusic()">🎵</button>
   </div>
 
-  <!-- Nhúng nhạc từ YouTube (ẩn) -->
+  <div class="container">
+    <h1>📚 Đếm Ngược Kỳ Thi THPT Quốc Gia</h1>
+    <div class="current-time" id="time">Giờ hiện tại: --:--:--</div>
+    <div class="countdown" id="countdown">Đang tải...</div>
+
+    <div class="controls">
+      <label for="examDate">Ngày thi:</label><br>
+      <input type="date" id="examDate">
+      <button onclick="setExamDate()">Lưu Ngày Thi</button>
+    </div>
+  </div>
+
+  <!-- YouTube API -->
   <div id="ytplayer"></div>
 
   <script>
-    let examDate = new Date("2025-06-26T00:00:00").getTime();
+    // Theme toggle
+    const body = document.body;
+    function setInitialTheme() {
+      const hour = new Date().getHours();
+      if (hour < 6 || hour >= 18) body.classList.add("dark");
+    }
+
+    function toggleTheme() {
+      body.classList.toggle("dark");
+    }
+
+    // Date from localStorage
+    let examDate = localStorage.getItem("examDate") 
+      ? new Date(localStorage.getItem("examDate")) 
+      : new Date("2025-06-26");
+
+    document.getElementById("examDate").valueAsDate = examDate;
+
+    function setExamDate() {
+      const val = document.getElementById("examDate").value;
+      if (val) {
+        examDate = new Date(val);
+        localStorage.setItem("examDate", val);
+        updateCountdown();
+      }
+    }
+
+    // Countdown
     const countdown = document.getElementById("countdown");
-
     function updateCountdown() {
-      const now = new Date().getTime();
-      const distance = examDate - now;
+      const now = new Date();
+      const diff = examDate - now;
 
-      if (distance < 0) {
-        countdown.innerHTML = "🎉 Kỳ thi đã diễn ra!";
-        clearInterval(interval);
+      if (diff <= 0) {
+        countdown.innerHTML = "🎉 Kỳ thi đã bắt đầu hoặc kết thúc!";
         return;
       }
 
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
 
       countdown.innerHTML = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
     }
 
-    const interval = setInterval(updateCountdown, 1000);
+    setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    function updateExamDate() {
-      const input = document.getElementById("examDate").value;
-      if (input) {
-        examDate = new Date(input + "T00:00:00").getTime();
-        updateCountdown();
-      } else {
-        alert("Vui lòng chọn ngày thi.");
-      }
+    // Clock
+    function updateTime() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString("vi-VN");
+      document.getElementById("time").innerText = `Giờ hiện tại: ${timeString}`;
     }
+    setInterval(updateTime, 1000);
+    updateTime();
 
-    function toggleTheme() {
-      document.body.classList.toggle("dark-theme");
-    }
-
-    // Nhạc YouTube
+    // YouTube Music
     let player;
-    let musicPlaying = false;
+    let playing = false;
 
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('ytplayer', {
         height: '0',
         width: '0',
-        videoId: '6kCtYMct3_0', // 🎵 ID video nhạc YouTube (có thể thay bằng video bạn thích)
+        videoId: '6kCtYMct3_0', // Bạn có thể thay bằng ID nhạc khác
         playerVars: {
-          'autoplay': 0,
-          'controls': 0,
-          'loop': 1,
-          'playlist': 'ZtRTh8BU4sQ', // để lặp lại
-          'mute': 0
+          autoplay: 0,
+          loop: 1,
+          playlist: '6kCtYMct3_0',
+          controls: 0
         },
         events: {
-          'onReady': onPlayerReady
+          'onReady': (e) => {}
         }
       });
     }
 
-    function onPlayerReady(event) {
-      // Không phát tự động - chờ user bấm nút bật
-    }
-
     function toggleMusic() {
       if (!player) return;
-      if (musicPlaying) {
+      if (playing) {
         player.pauseVideo();
       } else {
         player.playVideo();
       }
-      musicPlaying = !musicPlaying;
+      playing = !playing;
     }
 
-    // Tải thư viện YouTube API
-    let tag = document.createElement('script');
+    // Load YouTube API
+    const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
-    let firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-  </script>
+    const firstScript = document.getElementsByTagName('script')[0];
+    firstScript.parentNode.insertBefore(tag, firstScript);
 
+    // Init theme
+    setInitialTheme();
+  </script>
 </body>
 </html>
