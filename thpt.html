@@ -2,32 +2,89 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Đếm Ngược Kỳ Thi THPT Quốc Gia 2025</title>
+  <title>Đếm Ngược Kỳ Thi THPT Quốc Gia</title>
   <style>
+    :root {
+      --bg-light: #f5f5f5;
+      --text-light: #2c3e50;
+      --bg-dark: #121212;
+      --text-dark: #f0f0f0;
+      --accent: #e74c3c;
+    }
+
     body {
       font-family: 'Arial', sans-serif;
       text-align: center;
-      padding-top: 100px;
-      background-color: #f5f5f5;
+      padding-top: 50px;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: 0.3s;
     }
+
+    .dark-theme {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
     h1 {
-      color: #2c3e50;
+      font-size: 30px;
     }
+
     .countdown {
-      font-size: 40px;
-      color: #e74c3c;
+      font-size: 36px;
+      margin: 20px 0;
+      color: var(--accent);
+    }
+
+    .controls {
       margin-top: 20px;
+    }
+
+    input[type="date"] {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background-color: #3498db;
+      color: white;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
     }
   </style>
 </head>
 <body>
 
-  <h1>⏳ Còn Bao Lâu Đến Kỳ Thi THPT Quốc Gia 2025?</h1>
+  <button class="theme-toggle" onclick="toggleTheme()">🌗 Chuyển giao diện</button>
+
+  <h1>⏳ Đếm Ngược Kỳ Thi THPT Quốc Gia</h1>
+  
   <div class="countdown" id="countdown">Đang tải...</div>
 
+  <div class="controls">
+    <label for="examDate">Chọn ngày thi: </label>
+    <input type="date" id="examDate" />
+    <button onclick="updateExamDate()">Cập nhật</button>
+  </div>
+
   <script>
-    // Ngày thi THPT Quốc Gia (ví dụ: 26 tháng 6 năm 2025)
-    const examDate = new Date("2025-06-26T00:00:00").getTime();
+    let examDate = new Date("2025-06-26T00:00:00").getTime(); // Mặc định
 
     const countdown = document.getElementById("countdown");
 
@@ -36,7 +93,7 @@
       const distance = examDate - now;
 
       if (distance < 0) {
-        countdown.innerHTML = "🎉 Chúc mừng, kỳ thi đã kết thúc!";
+        countdown.innerHTML = "🎉 Kỳ thi đã diễn ra!";
         clearInterval(interval);
         return;
       }
@@ -52,6 +109,22 @@
     // Cập nhật mỗi giây
     const interval = setInterval(updateCountdown, 1000);
     updateCountdown();
+
+    // Cập nhật ngày từ input
+    function updateExamDate() {
+      const input = document.getElementById("examDate").value;
+      if (input) {
+        examDate = new Date(input + "T00:00:00").getTime();
+        updateCountdown();
+      } else {
+        alert("Vui lòng chọn ngày thi.");
+      }
+    }
+
+    // Chuyển theme
+    function toggleTheme() {
+      document.body.classList.toggle("dark-theme");
+    }
   </script>
 
 </body>
