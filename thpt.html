@@ -1,408 +1,449 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Đếm ngược kỳ thi THPT Quốc Gia - Premium</title>
-  <style>
-    /* Reset */
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f0f4f8;
-      color: #222;
-      transition: background-color 0.4s ease, color 0.4s ease;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-      text-align: center;
-    }
-    /* Dark theme */
-    body.dark-theme {
-      background-color: #121212;
-      color: #ddd;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Đếm ngược kỳ thi THPT Quốc Gia</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+  /* Reset cơ bản */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #f5f7fa;
+    color: #222;
+    margin: 0; padding: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+  body.dark {
+    background: #121212;
+    color: #eee;
+  }
+  .container {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    max-width: 460px;
+    width: 100%;
+    padding: 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+  body.dark .container {
+    background: #1f1f1f;
+  }
 
+  h1 {
+    font-weight: 700;
+    font-size: 2.4rem;
+    margin-bottom: 1rem;
+  }
+  .current-time {
+    font-size: 1.15rem;
+    color: #666;
+    margin-bottom: 2rem;
+    user-select: none;
+  }
+  body.dark .current-time {
+    color: #aaa;
+  }
+  .countdown {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 2.5rem;
+  }
+  .countdown > div {
+    background: #f0f3f8;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgb(0 0 0 / 0.05);
+    padding: 1.4rem 1.6rem;
+    width: 75px;
+    font-weight: 700;
+    font-size: 2.4rem;
+    color: #222;
+    user-select: none;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  body.dark .countdown > div {
+    background: #292929;
+    color: #eee;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+  }
+  .label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+    color: #999;
+  }
+  body.dark .label {
+    color: #bbb;
+  }
+
+  /* Form chọn ngày thi */
+  form {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  input[type="date"] {
+    border: 2px solid #007bff;
+    border-radius: 10px;
+    padding: 0.5rem 0.85rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #222;
+    outline-offset: 3px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+  }
+  input[type="date"]:focus {
+    border-color: #0056b3;
+  }
+  body.dark input[type="date"] {
+    background: #121212;
+    color: #eee;
+    border-color: #3399ff;
+  }
+  button[type="submit"] {
+    background: #007bff;
+    color: white;
+    font-weight: 700;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    box-shadow: 0 6px 12px rgb(0 123 255 / 0.45);
+    transition: background-color 0.3s ease;
+  }
+  button[type="submit"]:hover,
+  button[type="submit"]:focus {
+    background: #0056b3;
+    outline: none;
+  }
+
+  /* Các nút góc trên phải */
+  #controls {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 10px;
+    background: rgba(255 255 255 / 0.8);
+    border-radius: 50px;
+    padding: 6px 12px;
+    box-shadow: 0 10px 20px rgb(0 0 0 / 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 9999;
+    user-select: none;
+  }
+  body.dark #controls {
+    background: rgba(30 30 30 / 0.85);
+  }
+  #controls button {
+    all: unset;
+    cursor: pointer;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    border-radius: 50%;
+    color: #007bff;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  #controls button:hover, #controls button:focus {
+    background-color: #007bff;
+    color: white;
+    outline: none;
+  }
+  body.dark #controls button {
+    color: #66b2ff;
+  }
+  body.dark #controls button:hover, body.dark #controls button:focus {
+    background-color: #3399ff;
+  }
+  #volume {
+    width: 120px;
+    cursor: pointer;
+    margin-left: 6px;
+    align-self: center;
+  }
+  /* Thanh âm lượng */
+  #volume::-webkit-slider-runnable-track {
+    height: 6px;
+    background: #007bff;
+    border-radius: 3px;
+  }
+  #volume::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #0056b3;
+    border-radius: 50%;
+    margin-top: -6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  #volume::-webkit-slider-thumb:hover {
+    background: #003d80;
+  }
+  #volume::-moz-range-track {
+    height: 6px;
+    background: #007bff;
+    border-radius: 3px;
+  }
+  #volume::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #0056b3;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  #volume::-moz-range-thumb:hover {
+    background: #003d80;
+  }
+  /* Responsive mobile */
+  @media (max-width: 480px) {
+    .container {
+      padding: 1.5rem 1.8rem;
+      max-width: 100%;
+      border-radius: 14px;
+    }
     h1 {
-      font-size: 2.4rem;
-      margin-bottom: 0.5rem;
+      font-size: 1.8rem;
     }
-
-    #countdown {
-      font-size: 2.8rem;
-      font-weight: 700;
-      margin: 1rem 0 2rem 0;
-      letter-spacing: 0.05em;
+    .countdown > div {
+      width: 60px;
+      font-size: 2rem;
+      padding: 1rem 1.2rem;
     }
-
-    #current-time {
-      font-size: 1.2rem;
-      margin-bottom: 1.5rem;
-      font-weight: 500;
-      color: #555;
+    #controls {
+      padding: 6px 8px;
     }
-
-    /* Container tùy chỉnh ngày thi */
-    #set-date-container {
-      margin-bottom: 2rem;
+    #volume {
+      width: 90px;
     }
-
-    label {
-      font-weight: 600;
-      margin-right: 0.6rem;
-      font-size: 1rem;
-    }
-
-    input[type="date"] {
-      padding: 0.5rem 0.7rem;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: 1.8px solid #007bff;
-      outline: none;
-      transition: border-color 0.3s ease;
-    }
-    input[type="date"]:focus {
-      border-color: #0056b3;
-    }
-    button#btn-set-date {
-      background-color: #007bff;
-      color: white;
-      font-weight: 600;
-      border: none;
-      padding: 0.55rem 1.2rem;
-      margin-left: 1rem;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background-color 0.3s ease;
-    }
-    button#btn-set-date:hover, button#btn-set-date:focus {
-      background-color: #0056b3;
-      outline: none;
-    }
-
-    /* Top controls: nút đổi theme và nhạc */
-    #top-controls {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      z-index: 9999;
-      background: rgba(0,0,0,0.25);
-      padding: 6px 12px;
-      border-radius: 30px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    #top-controls button {
-      background: #007bff;
-      border: none;
-      color: white;
-      font-size: 1.3rem;
-      padding: 8px 12px;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 44px;
-      height: 44px;
-      user-select: none;
-    }
-
-    #top-controls button:hover, #top-controls button:focus {
-      background: #0056b3;
-      outline: none;
-    }
-
-    #top-controls input[type="range"] {
-      width: 100px;
-      cursor: pointer;
-      -webkit-appearance: none;
-      background: transparent;
-      vertical-align: middle;
-    }
-
-    #top-controls input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      background: #007bff;
-      cursor: pointer;
-      border-radius: 50%;
-      border: none;
-      margin-top: -6px;
-      transition: background-color 0.3s ease;
-    }
-
-    #top-controls input[type="range"]::-webkit-slider-thumb:hover {
-      background: #0056b3;
-    }
-
-    /* Firefox */
-    #top-controls input[type="range"]::-moz-range-thumb {
-      width: 18px;
-      height: 18px;
-      background: #007bff;
-      cursor: pointer;
-      border-radius: 50%;
-      border: none;
-      transition: background-color 0.3s ease;
-    }
-
-    #top-controls input[type="range"]::-moz-range-thumb:hover {
-      background: #0056b3;
-    }
-
-    /* Responsive nhỏ */
-    @media (max-width: 480px) {
-      body {
-        padding: 0.8rem;
-      }
-      h1 {
-        font-size: 1.8rem;
-      }
-      #countdown {
-        font-size: 2rem;
-      }
-      #current-time {
-        font-size: 1rem;
-      }
-      #set-date-container label,
-      #set-date-container input[type="date"],
-      #set-date-container button#btn-set-date {
-        font-size: 0.9rem;
-      }
-      #top-controls {
-        padding: 5px 8px;
-        gap: 6px;
-      }
-      #top-controls button {
-        width: 36px;
-        height: 36px;
-        font-size: 1.1rem;
-        padding: 6px 8px;
-      }
-      #top-controls input[type="range"] {
-        width: 70px;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <h1>Đếm ngược kỳ thi THPT Quốc Gia</h1>
+  <div class="container" role="main" aria-label="Đếm ngược kỳ thi THPT Quốc Gia">
+    <h1>Đếm ngược kỳ thi THPT Quốc Gia</h1>
+    <p class="current-time" id="current-time" aria-live="polite" aria-atomic="true">Đang lấy thời gian...</p>
 
-  <div id="set-date-container">
-    <label for="exam-date">Chọn ngày thi:</label>
-    <input type="date" id="exam-date" />
-    <button id="btn-set-date">Cập nhật</button>
+    <form id="form-set-date" aria-label="Chọn ngày thi">
+      <input type="date" id="exam-date" aria-required="true" aria-label="Chọn ngày thi" />
+      <button type="submit" aria-label="Cập nhật ngày thi">Cập nhật</button>
+    </form>
+
+    <div class="countdown" aria-live="polite" aria-atomic="true" id="countdown">
+      <div><span id="days">00</span><div class="label">Ngày</div></div>
+      <div><span id="hours">00</span><div class="label">Giờ</div></div>
+      <div><span id="minutes">00</span><div class="label">Phút</div></div>
+      <div><span id="seconds">00</span><div class="label">Giây</div></div>
+    </div>
   </div>
 
-  <div id="countdown">-- : -- : -- : --</div>
-  <div id="current-time">Giờ hiện tại: --:--:--</div>
-
-  <!-- Nút điều khiển -->
-  <div id="top-controls" role="region" aria-label="Điều khiển giao diện và nhạc">
-    <button id="btn-theme" title="Đổi giao diện" aria-label="Đổi giao diện">🎨</button>
-    <button id="audio-playpause" title="Bật / tắt nhạc" aria-label="Bật hoặc tắt nhạc">🔈</button>
-    <input type="range" id="audio-volume" min="0" max="1" step="0.01" value="0.4" title="Âm lượng" aria-label="Điều chỉnh âm lượng nhạc" />
+  <!-- Các nút điều khiển -->
+  <div id="controls" role="region" aria-label="Điều khiển nhạc và giao diện">
+    <button id="btn-theme-toggle" title="Chuyển đổi chế độ sáng/tối" aria-pressed="false" aria-label="Chuyển đổi chế độ sáng tối">
+      🌙
+    </button>
+    <button id="btn-music-toggle" title="Phát / Tạm dừng nhạc" aria-pressed="false" aria-label="Phát hoặc tạm dừng nhạc">
+      ▶️
+    </button>
+    <input type="range" id="volume" min="0" max="1" step="0.01" aria-label="Âm lượng nhạc" value="0.3" />
   </div>
 
-  <!-- Nhạc nền YouTube (ẩn) -->
-  <iframe
-    id="youtube-audio"
-    src="https://www.youtube.com/embed/8hZ7mgzplkg?autoplay=1&loop=1&playlist=8hZ7mgzplkg&controls=0&mute=1&enablejsapi=1"
-    frameborder="0"
-    allow="autoplay"
-    allowfullscreen
-    style="display:none"
-  ></iframe>
+<script>
+  // Cấu hình ngày mặc định kỳ thi (nên để thời gian tối đa 23:59:59 ngày đó)
+  const DEFAULT_EXAM_DATE = new Date('2025-06-15T23:59:59');
 
-  <script>
-    (() => {
-      const countdownEl = document.getElementById("countdown");
-      const currentTimeEl = document.getElementById("current-time");
-      const examDateInput = document.getElementById("exam-date");
-      const btnSetDate = document.getElementById("btn-set-date");
-      const btnTheme = document.getElementById("btn-theme");
-      const btnAudioPlayPause = document.getElementById("audio-playpause");
-      const audioVolumeSlider = document.getElementById("audio-volume");
-      const iframe = document.getElementById("youtube-audio");
+  // Lấy các element
+  const currentTimeEl = document.getElementById('current-time');
+  const daysEl = document.getElementById('days');
+  const hoursEl = document.getElementById('hours');
+  const minutesEl = document.getElementById('minutes');
+  const secondsEl = document.getElementById('seconds');
+  const form = document.getElementById('form-set-date');
+  const examDateInput = document.getElementById('exam-date');
 
-      // YouTube Iframe API
-      let player;
-      function onYouTubeIframeAPIReady() {
-        player = new YT.Player("youtube-audio", {
-          events: {
-            onReady: onPlayerReady,
-            onStateChange: onPlayerStateChange,
-          },
-        });
-      }
-      // Load YouTube Iframe API script
-      const tag = document.createElement("script");
-      tag.src = "https://www.youtube.com/iframe_api";
-      document.head.appendChild(tag);
+  const btnThemeToggle = document.getElementById('btn-theme-toggle');
+  const btnMusicToggle = document.getElementById('btn-music-toggle');
+  const volumeControl = document.getElementById('volume');
 
-      function onPlayerReady(event) {
-        player.setVolume(audioVolumeSlider.value * 100);
-        // Mặc định tắt nhạc, user tự bật
-        player.pauseVideo();
-      }
+  // Load ngày mặc định vào input
+  function formatDateInput(date) {
+    return date.toISOString().split('T')[0];
+  }
+  examDateInput.value = formatDateInput(DEFAULT_EXAM_DATE);
 
-      function onPlayerStateChange(event) {
-        // Có thể thêm xử lý nếu cần
-      }
+  // Lưu ngày thi trong localStorage để nhớ lần sau
+  let examDate = DEFAULT_EXAM_DATE;
+  if(localStorage.getItem('examDate')) {
+    examDate = new Date(localStorage.getItem('examDate'));
+    examDateInput.value = formatDateInput(examDate);
+  }
 
-      // Thao tác bật/tắt nhạc
-      function playPauseMusic() {
-        if (!player) return;
-        const state = player.getPlayerState();
-        if (state === YT.PlayerState.PLAYING) {
-          player.pauseVideo();
-          btnAudioPlayPause.textContent = "🔈";
-        } else {
-          player.playVideo();
-          btnAudioPlayPause.textContent = "🔊";
+  // Theme mặc định
+  let isDarkMode = false;
+  if(localStorage.getItem('theme')) {
+    isDarkMode = localStorage.getItem('theme') === 'dark';
+    document.body.classList.toggle('dark', isDarkMode);
+    btnThemeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+    btnThemeToggle.setAttribute('aria-pressed', isDarkMode.toString());
+  }
+
+  // Nhạc nền YouTube iframe
+  let isPlaying = false;
+  let player;
+  let ytReady = false;
+
+  // Tạo iframe nhạc YouTube ẩn
+  function createYouTubePlayer() {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(tag);
+  }
+  createYouTubePlayer();
+
+  // Callback YouTube API
+  window.onYouTubeIframeAPIReady = function() {
+    player = new YT.Player('yt-player', {
+      height: '0',
+      width: '0',
+      videoId: 'XqZsoesa55w', // Ví dụ nhạc nhẹ, bạn đổi ID này nếu muốn
+      playerVars: {
+        autoplay: 0,
+        controls: 0,
+        loop: 1,
+        playlist: 'XqZsoesa55w',
+        modestbranding: 1,
+        disablekb: 1,
+        fs: 0,
+        rel: 0,
+      },
+      events: {
+        onReady: (event) => {
+          ytReady = true;
+          event.target.setVolume(volumeControl.value * 100);
+        },
+        onStateChange: (event) => {
+          if(event.data === YT.PlayerState.ENDED) {
+            player.playVideo();
+          }
         }
       }
+    });
+  };
 
-      // Thay đổi âm lượng
-      function setVolumeMusic(value) {
-        if (!player) return;
-        player.setVolume(value * 100);
-      }
+  // Tạo iframe ẩn cho YouTube nhạc
+  const ytDiv = document.createElement('div');
+  ytDiv.id = 'yt-player';
+  ytDiv.style.position = 'absolute';
+  ytDiv.style.left = '-9999px';
+  ytDiv.style.width = '0';
+  ytDiv.style.height = '0';
+  document.body.appendChild(ytDiv);
 
-      btnAudioPlayPause.addEventListener("click", playPauseMusic);
-      audioVolumeSlider.addEventListener("input", (e) => {
-        setVolumeMusic(e.target.value);
-      });
+  // Bật / tắt nhạc
+  btnMusicToggle.addEventListener('click', () => {
+    if(!ytReady) return;
+    if(isPlaying) {
+      player.pauseVideo();
+      btnMusicToggle.textContent = '▶️';
+      btnMusicToggle.setAttribute('aria-pressed', 'false');
+    } else {
+      player.playVideo();
+      btnMusicToggle.textContent = '⏸️';
+      btnMusicToggle.setAttribute('aria-pressed', 'true');
+    }
+    isPlaying = !isPlaying;
+  });
 
-      // Xử lý theme
-      function toggleTheme() {
-        document.body.classList.toggle("dark-theme");
-        // Lưu theme vào localStorage
-        if (document.body.classList.contains("dark-theme")) {
-          localStorage.setItem("theme", "dark");
-        } else {
-          localStorage.setItem("theme", "light");
-        }
-      }
+  // Điều chỉnh âm lượng
+  volumeControl.addEventListener('input', () => {
+    if(ytReady && player) {
+      player.setVolume(volumeControl.value * 100);
+    }
+  });
 
-      btnTheme.addEventListener("click", toggleTheme);
+  // Chuyển đổi theme sáng/tối
+  btnThemeToggle.addEventListener('click', () => {
+    isDarkMode = !isDarkMode;
+    document.body.classList.toggle('dark', isDarkMode);
+    btnThemeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+    btnThemeToggle.setAttribute('aria-pressed', isDarkMode.toString());
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  });
 
-      // Load theme lúc bắt đầu
-      function loadTheme() {
-        const theme = localStorage.getItem("theme");
-        if (theme === "dark") {
-          document.body.classList.add("dark-theme");
-        }
-      }
-      loadTheme();
+  // Xử lý form thay đổi ngày thi
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const val = examDateInput.value;
+    if(!val) return alert('Vui lòng chọn ngày thi hợp lệ.');
+    const newDate = new Date(val + 'T23:59:59');
+    if(isNaN(newDate.getTime())) {
+      alert('Ngày không hợp lệ!');
+      return;
+    }
+    examDate = newDate;
+    localStorage.setItem('examDate', examDate.toISOString());
+  });
 
-      // Xử lý ngày thi
-      function getDefaultExamDate() {
-        const now = new Date();
-        return new Date(now.getFullYear(), 5, 7); // 07/06 năm hiện tại (tháng 5 vì tháng bắt đầu từ 0)
-      }
+  // Cập nhật thời gian hiện tại
+  function updateCurrentTime() {
+    const now = new Date();
+    currentTimeEl.textContent = `Bây giờ là: ${now.toLocaleString('vi-VN')}`;
+  }
 
-      // Lưu ngày thi trong localStorage
-      function saveExamDate(dateStr) {
-        localStorage.setItem("examDate", dateStr);
-      }
+  // Tính toán đếm ngược
+  function updateCountdown() {
+    const now = new Date();
+    let diff = examDate.getTime() - now.getTime();
 
-      // Lấy ngày thi từ localStorage hoặc mặc định
-      function loadExamDate() {
-        const saved = localStorage.getItem("examDate");
-        if (saved) return new Date(saved);
-        return getDefaultExamDate();
-      }
+    if(diff < 0) {
+      daysEl.textContent = '00';
+      hoursEl.textContent = '00';
+      minutesEl.textContent = '00';
+      secondsEl.textContent = '00';
+      return;
+    }
 
-      // Cập nhật input ngày thi theo ngày lưu
-      function updateExamDateInput(date) {
-        const yyyy = date.getFullYear();
-        const mm = (date.getMonth() + 1).toString().padStart(2, "0");
-        const dd = date.getDate().toString().padStart(2, "0");
-        examDateInput.value = `${yyyy}-${mm}-${dd}`;
-      }
+    const seconds = Math.floor(diff / 1000) % 60;
+    const minutes = Math.floor(diff / (1000 * 60)) % 60;
+    const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-      let examDate = loadExamDate();
-      updateExamDateInput(examDate);
+    daysEl.textContent = String(days).padStart(2, '0');
+    hoursEl.textContent = String(hours).padStart(2, '0');
+    minutesEl.textContent = String(minutes).padStart(2, '0');
+    secondsEl.textContent = String(seconds).padStart(2, '0');
+  }
 
-      btnSetDate.addEventListener("click", () => {
-        const val = examDateInput.value;
-        if (!val) {
-          alert("Vui lòng chọn ngày thi hợp lệ.");
-          return;
-        }
-        const selectedDate = new Date(val);
-        if (isNaN(selectedDate)) {
-          alert("Ngày thi không hợp lệ.");
-          return;
-        }
-        examDate = selectedDate;
-        saveExamDate(val);
-        alert(`Ngày thi được đặt là ${val}`);
-      });
+  // Vòng lặp cập nhật
+  setInterval(() => {
+    updateCurrentTime();
+    updateCountdown();
+  }, 1000);
 
-      // Hàm đếm ngược
-      function updateCountdown() {
-        const now = new Date();
-
-        // Hiển thị giờ hiện tại theo múi giờ VN
-        const vnTime = new Date(
-          now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" })
-        );
-        currentTimeEl.textContent =
-          "Giờ hiện tại: " +
-          vnTime.toLocaleTimeString("vi-VN", { hour12: false });
-
-        // Khoảng cách đến ngày thi (giờ 0:00:00 ngày thi)
-        const examDateStart = new Date(
-          examDate.getFullYear(),
-          examDate.getMonth(),
-          examDate.getDate()
-        );
-
-        const distance = examDateStart - vnTime;
-
-        if (distance <= 0) {
-          countdownEl.textContent = "Kỳ thi đã bắt đầu hoặc đã kết thúc!";
-          return;
-        }
-
-        // Tính ngày giờ phút giây
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor(
-          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-        );
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        countdownEl.textContent = `${days
-          .toString()
-          .padStart(2, "0")} : ${hours
-          .toString()
-          .padStart(2, "0")} : ${minutes
-          .toString()
-          .padStart(2, "0")} : ${seconds.toString().padStart(2, "0")}`;
-      }
-
-      updateCountdown();
-      setInterval(updateCountdown, 1000);
-    })();
-  </script>
+  // Khởi tạo ngay
+  updateCurrentTime();
+  updateCountdown();
+</script>
 </body>
 </html>
