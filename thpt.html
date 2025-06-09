@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đếm Ngược Kỳ Thi THPT Quốc Gia 2025</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding-top: 100px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .countdown {
+      font-size: 40px;
+      color: #e74c3c;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⏳ Còn Bao Lâu Đến Kỳ Thi THPT Quốc Gia 2025?</h1>
+  <div class="countdown" id="countdown">Đang tải...</div>
+
+  <script>
+    // Ngày thi THPT Quốc Gia (ví dụ: 26 tháng 6 năm 2025)
+    const examDate = new Date("2025-06-26T00:00:00").getTime();
+
+    const countdown = document.getElementById("countdown");
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = examDate - now;
+
+      if (distance < 0) {
+        countdown.innerHTML = "🎉 Chúc mừng, kỳ thi đã kết thúc!";
+        clearInterval(interval);
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      countdown.innerHTML = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
+    }
+
+    // Cập nhật mỗi giây
+    const interval = setInterval(updateCountdown, 1000);
+    updateCountdown();
+  </script>
+
+</body>
+</html>
