@@ -1,238 +1,36 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>🎓 Đếm Ngược Kỳ Thi THPT Quốc Gia</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    :root {
-      --light-bg: url('https://images.unsplash.com/photo-1531219432768-9f540ce91ef1?auto=format&fit=crop&w=1920&q=80');
-      --dark-bg: url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1920&q=80');
-      --glass-light: rgba(255,255,255,0.25);
-      --glass-dark: rgba(0,0,0,0.4);
-      --text-light: #000;
-      --text-dark: #fff;
-      --accent: #ff416c;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--light-bg) no-repeat center center fixed;
-      background-size: cover;
-      color: var(--text-light);
-      transition: all 0.5s ease;
-    }
-
-    body.dark {
-      background: var(--dark-bg) no-repeat center center fixed;
-      color: var(--text-dark);
-    }
-
-    .container {
-      backdrop-filter: blur(20px);
-      background: var(--glass-light);
-      border-radius: 20px;
-      padding: 30px;
-      margin: 80px auto;
-      width: 90%;
-      max-width: 600px;
-      text-align: center;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-      transition: 0.5s;
-    }
-
-    body.dark .container {
-      background: var(--glass-dark);
-    }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .countdown, .current-time {
-      font-size: 24px;
-      margin: 10px 0;
-      color: var(--accent);
-    }
-
-    .controls {
-      margin-top: 20px;
-    }
-
-    input[type="date"] {
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      font-size: 16px;
-      margin: 5px;
-    }
-
-    button {
-      padding: 10px 16px;
-      font-size: 16px;
-      border: none;
-      border-radius: 10px;
-      background: var(--accent);
-      color: white;
-      margin: 5px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      opacity: 0.9;
-    }
-
-    .top-buttons {
-      position: fixed;
-      top: 15px;
-      right: 15px;
-      z-index: 999;
-      display: flex;
-      gap: 10px;
-    }
-
-    .top-buttons button {
-      padding: 8px 12px;
-      font-size: 14px;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.5);
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    #ytplayer {
-      display: none;
-    }
-
-    @media (max-width: 600px) {
-      h1 { font-size: 22px; }
-      .countdown, .current-time { font-size: 18px; }
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🎓 Đếm Ngược Kỳ Thi THPT Quốc Gia - Luxury</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id="particles-js"></div>
 
   <div class="top-buttons">
-    <button onclick="toggleTheme()">🌙/☀️</button>
-    <button onclick="toggleMusic()">🎵</button>
+    <button id="theme-toggle" aria-label="Chuyển đổi chủ đề">🌙/☀️</button>
+    <button id="music-toggle" aria-label="Bật/Tắt nhạc nền">🎵</button>
   </div>
 
-  <div class="container">
+  <main class="container glassmorphism">
     <h1>📚 Đếm Ngược Kỳ Thi THPT Quốc Gia</h1>
-    <div class="current-time" id="time">Giờ hiện tại: --:--:--</div>
-    <div class="countdown" id="countdown">Đang tải...</div>
+    <div id="current-time" class="current-time">Giờ hiện tại: --:--:--</div>
+    <div id="countdown" class="countdown">Đang tải...</div>
 
     <div class="controls">
-      <label for="examDate">Ngày thi:</label><br>
-      <input type="date" id="examDate">
-      <button onclick="setExamDate()">Lưu Ngày Thi</button>
+      <label for="examDate">Chọn ngày thi:</label><br />
+      <input type="date" id="examDate" />
+      <button id="saveDate">Lưu ngày thi</button>
     </div>
-  </div>
+  </main>
 
-  <!-- YouTube API -->
+  <!-- YouTube Player -->
   <div id="ytplayer"></div>
 
-  <script>
-    // Theme toggle
-    const body = document.body;
-    function setInitialTheme() {
-      const hour = new Date().getHours();
-      if (hour < 6 || hour >= 18) body.classList.add("dark");
-    }
-
-    function toggleTheme() {
-      body.classList.toggle("dark");
-    }
-
-    // Date from localStorage
-    let examDate = localStorage.getItem("examDate") 
-      ? new Date(localStorage.getItem("examDate")) 
-      : new Date("2025-06-26");
-
-    document.getElementById("examDate").valueAsDate = examDate;
-
-    function setExamDate() {
-      const val = document.getElementById("examDate").value;
-      if (val) {
-        examDate = new Date(val);
-        localStorage.setItem("examDate", val);
-        updateCountdown();
-      }
-    }
-
-    // Countdown
-    const countdown = document.getElementById("countdown");
-    function updateCountdown() {
-      const now = new Date();
-      const diff = examDate - now;
-
-      if (diff <= 0) {
-        countdown.innerHTML = "🎉 Kỳ thi đã bắt đầu hoặc kết thúc!";
-        return;
-      }
-
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-
-      countdown.innerHTML = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
-    }
-
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
-
-    // Clock
-    function updateTime() {
-      const now = new Date();
-      const timeString = now.toLocaleTimeString("vi-VN");
-      document.getElementById("time").innerText = `Giờ hiện tại: ${timeString}`;
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
-
-    // YouTube Music
-    let player;
-    let playing = false;
-
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('ytplayer', {
-        height: '0',
-        width: '0',
-        videoId: '6kCtYMct3_0', // Bạn có thể thay bằng ID nhạc khác
-        playerVars: {
-          autoplay: 0,
-          loop: 1,
-          playlist: '6kCtYMct3_0',
-          controls: 0
-        },
-        events: {
-          'onReady': (e) => {}
-        }
-      });
-    }
-
-    function toggleMusic() {
-      if (!player) return;
-      if (playing) {
-        player.pauseVideo();
-      } else {
-        player.playVideo();
-      }
-      playing = !playing;
-    }
-
-    // Load YouTube API
-    const tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    const firstScript = document.getElementsByTagName('script')[0];
-    firstScript.parentNode.insertBefore(tag, firstScript);
-
-    // Init theme
-    setInitialTheme();
-  </script>
+  <script src="particles.min.js"></script>
+  <script src="script.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
